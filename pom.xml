@@ -14,12 +14,11 @@
       <version>3.8.1</version>
       <scope>test</scope>      
     </dependency>
-    <dependency>    
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version>
-      <scope>provided</scope>
-	  </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1-b08</version>
+    </dependency>
 	  <dependency>
 	    <groupId>com.googlecode.json-simple</groupId>
 	    <artifactId>json-simple</artifactId>
@@ -31,20 +30,23 @@
       <version>1.7.13</version>
     </dependency>
 	  <dependency>
-	    <groupId>com.ifactory.client.openweather</groupId>      
-	    <artifactId>open-weather</artifactId>
-	    <version>1.1-SNAPSHOT</version>
+	    <groupId>com.ifactory.client.greenwich</groupId>      
+	    <artifactId>greenwich</artifactId>
+	    <version>1.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
     <finalName>weather-server</finalName>
     <plugins>
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <version>6.1.26</version>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.0.0.v20130308</version>
         <configuration>
-          <webApp>${basedir}/target/weather-server</webApp>
+          <scanIntervalSeconds>10</scanIntervalSeconds>
+          <webApp>
+            <contextPath>/weather-server</contextPath>
+          </webApp>
         </configuration>
       </plugin>      
     </plugins>
