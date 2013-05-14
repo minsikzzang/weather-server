@@ -28,35 +28,51 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.NumberFormatException;
 
-@WebServlet(urlPatterns = {"/weather"}, asyncSupported = true)
-public class WeatherServlet extends HttpServlet {
+@WebServlet(urlPatterns = {"/forecast"}, asyncSupported = true)             
+public class ForecastServlet extends HttpServlet {
   static final String ATTRIBUTE_LAT = "lat";
 	static final String ATTRIBUTE_LNG = "lng";
+	static final String ATTRIBUTE_DAILY = "daily";
+	static final String ATTRIBUTE_CNT = "cnt";
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
 	    throws IOException {
 	  resp.setContentType("application/json");
     final AsyncContext aCtx = req.startAsync(req, resp);
-    aCtx.start(new GetWeatherService(aCtx));
+    aCtx.start(new GetForecastService(aCtx));
 	}
 	
-	private class GetWeatherService implements Runnable {
+	private class GetForecastService implements Runnable {
 	  AsyncContext aCtx;
 
-    public GetWeatherService(AsyncContext aCtx) {
+    public GetForecastService(AsyncContext aCtx) {
       this.aCtx = aCtx;
     }
 
     @Override
     public void run() {
       HttpServletRequest req = (HttpServletRequest)aCtx.getRequest();
-      double lat = Double.parseDouble(req.getParameter(ATTRIBUTE_LAT));
-      double lng = Double.parseDouble(req.getParameter(ATTRIBUTE_LNG));
-      
-      WeatherService service = new WeatherService(aCtx);            
-      service.getCurrentWeather(lat, lng);      	        
+      try {
+        double lat = Double.parseDouble(req.getParameter(ATTRIBUTE_LAT));
+        double lng = Double.parseDouble(req.getParameter(ATTRIBUTE_LNG));
+        boolean daily = Boolean.valueOf(req.getParameter(ATTRIBUTE_DAILY))
+          .booleanValue();  
+        int count = Integer.parseInt(req.getParameter(ATTRIBUTE_CNT));
+
+        WeatherService service = new WeatherService(aCtx);   
+        if (daily) {
+          service.getDailyForecast(lat, lng, count);
+        } else {
+          service.getHourlyForecast(lat, lng, count);
+        }  
+      } catch (NumberFormatException e) {
+        ((HttpServletResponse)aCtx.getResponse())
+          .setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        aCtx.complete();
+      }      
     }	  
 	}
 }
